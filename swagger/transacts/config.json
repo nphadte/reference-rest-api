@@ -1,0 +1,27 @@
+{
+	"name": "transacts",
+	"version": "1.00.00",
+	"groupId": "training",
+	"artifactId": "transacts",
+	"rootPackage": "com.cibc.api.training.transacts",
+	"handlerPackage":"com.cibc.api.training.transacts.handler",
+	"modelPackage":"com.cibc.api.training.transacts.model",
+	"overwriteHandler": true,
+	"overwriteHandlerTest": true,
+	"overwriteModel": true,
+	"httpPort": 7040,
+	"enableHttp": false,
+	"httpsPort": 8473,
+	"enableHttps": true,
+	"enableRegistry": false,
+	"supportDb": true,
+	  "dbInfo": {
+	    "name": "oracle",
+	    "driverClassName": "oracle.jdbc.pool.OracleDataSource",
+	    "jdbcUrl": "jdbc:oracle:thin:@localhost:1521:XE",
+	    "username": "SYSTEM",
+	    "password": "oracle"
+	  },
+	  "supportH2ForTest": true,
+	  "supportClient": true
+}

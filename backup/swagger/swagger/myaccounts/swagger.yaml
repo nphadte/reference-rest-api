@@ -1,0 +1,151 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: MyAccounts API
+  description: MyAccounts API - retrieve the Customer portfolio information
+  contact:
+    email: cibc.api.reference.training@gmail.com
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: api.cibc.com
+schemes:
+  - http
+basePath: /v1
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /myaccounts/{id}:
+    get:
+      description: Returns portfolio information for a single customer based upon the provided id
+      operationId: findMyAccountsById
+      produces:
+          - application/json
+      parameters:
+        - in: path
+          name: id
+          description: ID of Customer to retrieve.
+          required: true
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: Portfolio information returned for the matching Customer ID
+          schema:
+            properties:
+              customers:
+                $ref: '#/definitions/customer'
+              accounts:
+                type: array
+                items:
+                  properties:
+                    account:
+                      $ref: '#/definitions/account'
+                    transactions:
+                      type: array
+                      items:
+                        $ref: '#/definitions/transaction'
+        404:
+          description: No account information has been found for the account
+          schema:
+              $ref: '#/definitions/error'                                    
+      security:
+        - customers_auth:
+          - training.myaccounts.read
+
+securityDefinitions:
+  customers_auth:
+    type: oauth2
+    authorizationUrl: http://localhost:8080/oauth2/code
+    flow: implicit
+    scopes:
+      training.myaccounts.read: read access
+
+definitions:
+  customer:
+    type: object
+    required:
+      - id
+      - firstName
+      - lastName
+    properties:
+      id:
+        type: string
+      firstName:
+        type: string
+      middleInitial:
+        type: string
+      lastName:
+        type: string
+
+  account:
+    type: object
+    required:
+      - id
+      - customerID
+      - accountType
+      - balance
+    properties:
+      id:
+        description: Account ID
+        type: string
+      customerID:
+        description: The customer ID identifying the Account holder
+        type: string
+      accountType:
+        type: string
+        description: The supported account types
+        enum: [DEPOSIT,
+        SAVINGS,
+        CREDIT,
+        MORTGAGE,
+        LOC]
+      balance:
+        type: number
+        format: double
+
+  transaction:
+    type: object
+    required:
+      - id
+      - accountID
+      - transactionType
+      - amount
+    properties:
+      id:
+        description: Transaction ID
+        type: string
+      accountID:
+        description: The Account ID identifying the Account
+        type: string
+      transactionType:
+        type: string
+        description: The supported transaction types
+        enum: [DEBIT,
+        CREDIT]
+      amount:
+        type: number
+        format: double
+
+  error:
+    type: object
+    required:
+      - statusCode
+      - code
+      - message
+      - description
+    properties:
+      statusCode:
+        type: integer
+        format: int32
+      code:
+        type: string
+      message:
+        type: string
+      description:
+        type: string

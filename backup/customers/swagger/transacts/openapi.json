@@ -1,0 +1,194 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Transactions API",
+    "description": "Retrieve transaction data for an account",
+    "contact": {
+      "email": "cibc.api.reference.training@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://api.cibc.com/v1"
+    }
+  ],
+  "paths": {
+    "/transactions/{id}": {
+      "get": {
+        "description": "Returns information for a single transaction based upon the provided transaction id",
+        "operationId": "findTransactionById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "ID of Transaction to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction record for the specified Account ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/transaction"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer has not been found for the specified ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accounts_auth": [
+              "training.transacts.read"
+            ]
+          }
+        ]
+      }
+    },
+    "/transactions": {
+      "get": {
+        "description": "Returns transactions matching an Account ID",
+        "operationId": "findTransactionByAccountId",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "account_id",
+            "description": "ID of Account for which to retrieve transaction data",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction records returned for the matching Account ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/transactions"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No transaction data has been found for the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accounts_auth": [
+              "training.transacts.read"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "party_auth": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "http://localhost:8888/oauth2/token",
+            "scopes": {
+              "training.accounts.read": "read access"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "transaction": {
+        "type": "object",
+        "required": [
+          "id",
+          "accountID",
+          "transactionType",
+          "amount"
+        ],
+        "properties": {
+          "id": {
+            "description": "Transaction ID",
+            "type": "string"
+          },
+          "accountID": {
+            "description": "The Account ID identifying the Account",
+            "type": "string"
+          },
+          "transactionType": {
+            "type": "string",
+            "description": "The supported transaction types",
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "transactions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/transaction"
+        }
+      },
+      "error": {
+        "type": "object",
+        "required": [
+          "statusCode",
+          "code",
+          "message",
+          "description"
+        ],
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
